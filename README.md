@@ -1,5 +1,6 @@
 
 This method only logs on TELEMETRY logs, not .bin (internally in pixhawk)
+Im currently developing a method that uses LUA scripting, so that it logs on Telemetry and .bin
 
 # stm32-current-pixhawk
 
