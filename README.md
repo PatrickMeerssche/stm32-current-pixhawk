@@ -1,3 +1,6 @@
+
+This method only logs on TELEMETRY logs, not .bin (internally in pixhawk)
+
 # stm32-current-pixhawk
 
 STM32 Bluepill firmware that reads an ACS758 current sensor and publishes it to a Pixhawk
