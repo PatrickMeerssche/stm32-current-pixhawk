@@ -1,6 +1,6 @@
 
 This method only logs on TELEMETRY logs, not .bin (internally in pixhawk)
-Im currently developing a method that uses LUA scripting, so that it logs on Telemetry and .bin
+Im currently developing a method that uses LUA scripting, so that it logs on Telemetry and .bin  located at [serial_script](https://github.com/PatrickMeerssche/stm32-current-pixhawk/tree/serial_script))
 
 # stm32-current-pixhawk
 
