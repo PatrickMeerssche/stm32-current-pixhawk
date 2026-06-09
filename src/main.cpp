@@ -26,16 +26,14 @@
 
 // MAVLink identity (tune these to avoid collisions with the autopilot)
 // - `MAV_SYSTEM_ID`: unique system id for this external telemetry source.
-//   Pick a value that is different from your vehicle (avoid `1` if the
-//   autopilot uses it). Example: 42.
 // - `MAV_COMPONENT_ID`: component id for this board (any unused small value).
 // - `MAV_BATTERY_ID_EXTERNAL`: battery id used in BATTERY_STATUS frames.
 //   Use a different battery id than the autopilot's main battery so the
 //   telemetry appears as an external source in Mission Planner / QGroundControl.
 // To change identity: edit these defines and rebuild. Keep them consistent
 // if you power multiple telemetry sources on the same bus.
-#define MAV_SYSTEM_ID 42
-#define MAV_COMPONENT_ID 158
+#define MAV_SYSTEM_ID 1
+#define MAV_COMPONENT_ID 180
 #define MAV_BATTERY_ID_EXTERNAL 1
 
 // DEBUG: when set to 1 the firmware publishes a fixed test current value
@@ -51,7 +49,7 @@ static HardwareSerial &TelemetrySerial = Serial1;
 static unsigned long logStartMs = 0;
 static const unsigned long LOG_INTERVAL_MS = 80;
 static const unsigned long STARTUP_ANALYSIS_MS = 3000;
-static const unsigned long MAVLINK_TX_INTERVAL_MS = 1000;
+static const unsigned long MAVLINK_TX_INTERVAL_MS = 100;
 
 static void travarComPiscaErro() {
   while (true) {
@@ -79,7 +77,8 @@ static void enviarBatteryStatus(const DadosCorrente &dados, float tempoDecorrido
   mavlink_message_t msg;
   uint16_t voltages[10];
   uint16_t voltagesExt[4];
-  for (unsigned int i = 0; i < 10; ++i) {
+  voltages[0] = 5000;
+  for (unsigned int i = 1; i < 10; ++i) {
     voltages[i] = UINT16_MAX;
   }
   for (unsigned int i = 0; i < 4; ++i) {
@@ -94,7 +93,7 @@ static void enviarBatteryStatus(const DadosCorrente &dados, float tempoDecorrido
     MAV_COMPONENT_ID,
     &msg,
     MAV_BATTERY_ID_EXTERNAL,
-    MAV_BATTERY_FUNCTION_PAYLOAD,
+    1,
     MAV_BATTERY_TYPE_UNKNOWN,
     INT16_MAX,
     voltages,
@@ -217,11 +216,11 @@ void setup() {
   pinMode(PC13, OUTPUT);
   digitalWrite(PC13, HIGH);
 
-  MySerial.begin(115200);
+  MySerial.begin(57200);
   while (!MySerial && millis() < 4000) { ; }
   delay(1000);
 
-  TelemetrySerial.begin(115200);
+  TelemetrySerial.begin(57200);
   enviarHeartbeatInicial();
 
   MySerial.println(">>> Datalogger de Corrente DC <<<");

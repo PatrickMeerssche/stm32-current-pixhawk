@@ -56,15 +56,15 @@ void configurarSensoresCorrente() {
 // offset value or skip it entirely (but ensure `offset_DC` is set to a
 // reasonable value for your hardware).
 void calibrarZeroCorrente() {
-        long somaDC  = 0;
-        int n = 1000;
+        // long somaDC  = 0;
+        // int n = 1000;
 
-        delay(1000); // wait for sensor/regulator to stabilize
+        // delay(1000); // wait for sensor/regulator to stabilize
 
-        for(int i=0; i<n; i++) {
-                somaDC  += analogRead(PIN_DC);
-                delay(1);
-        }
+        // for(int i=0; i<n; i++) {
+        //         somaDC  += analogRead(PIN_DC);
+        //         delay(1);
+        // }
 
         // The offset value below was determined empirically in test runs. If you
         // re-run calibration on your hardware, this value will be overwritten by
