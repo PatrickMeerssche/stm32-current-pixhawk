@@ -78,10 +78,23 @@ If data still does not arrive in Lua, verify the selected serial port has both
 - `SENSIBILIDADE_V_A` in `src/MedirCorrente.cpp` is the sensor sensitivity in V/A.
   Example: ACS758LCB-100B at 3.3V → ~13.2 mV/A → `0.0132` V/A.
 - `CURRENT_GAIN_CAL` is a software multiplier used to align firmware readings with
-  a trusted meter. To calibrate:
-  1. Apply a known current and record the firmware reading.
-  2. Compute `gain = true_current / measured_current`.
-  3. Update `CURRENT_GAIN_CAL` in `src/MedirCorrente.cpp` and rebuild.
+  a trusted meter.
+
+**Current calibration status:**
+- **Calibration Date:** June 2026 (from log_195 flight data)
+- **CURRENT_GAIN_CAL:** `0.9146f` (corrects ~8.5% high reading)
+- **Calibration Method:** Parallel telemetry comparison (369 measurement pairs)
+  - Known sensor (BATT1): Pixhawk native battery monitor (instance 0)
+  - Test sensor (BATT2): STM32 custom sensor (instance 1)
+  - Analysis: Computed ratio of known current ÷ measured current across flight envelope
+  
+**To recalibrate:**
+1. Fly a test mission with both battery monitors active and logging enabled.
+2. Download the BAT.csv telemetry log (contains BATT1 and BATT2 telemetry).
+3. Compare instance 0 (reference) vs instance 1 (STM32) current values.
+4. Compute `gain = mean(instance_0_current) / mean(instance_1_current)`.
+5. Update `CURRENT_GAIN_CAL` in `src/MedirCorrente.cpp` with the new gain value.
+6. Rebuild and flash the STM32 firmware.
 
 ## Files to edit
 
