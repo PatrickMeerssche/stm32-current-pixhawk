@@ -36,7 +36,7 @@ const float SENSIBILIDADE_V_A = 0.0132;       // 13.2mV/A for ACS758 at 3.3V
 // CURRENT_GAIN_CAL: software calibration multiplier to scale measured current
 // to match a known reference. Adjust after taking a measured reading vs a
 // trusted meter. Example in this repo: measured 220 -> real 252 => ~1.145x
-const float CURRENT_GAIN_CAL = 0.9146f;       // Calibrated from log_195 flight data (369 samples)
+const float CURRENT_GAIN_CAL = 2.188f; // multiplicative gain calibration factor
 const float OFFSET_DC_DEFAULT = 2022.10;      // Offset measured at zero current
 
 // --- VARIÁVEIS DE CALIBRAÇÃO (OFFSET) ---
