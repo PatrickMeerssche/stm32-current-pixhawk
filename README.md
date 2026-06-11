@@ -3,7 +3,7 @@
 
 > **Note:** This method only logs on TELEMETRY logs, not .bin (internally in pixhawk).
 > __
-> ---> This is better | I also implemented LUA scripting so it logs to both Telemetry and .bin files (see [serial_script](https://github.com/PatrickMeerssche/stm32-current-pixhawk/tree/serial_script)).
+>  I also implemented LUA scripting so it logs to both Telemetry and .bin files (see [serial_script](https://github.com/PatrickMeerssche/stm32-current-pixhawk/tree/serial_script)). ---> This is better
 
 STM32 Bluepill firmware that reads an ACS758 current sensor and publishes it to a Pixhawk
 autopilot as MAVLink `BATTERY_STATUS` telemetry.
