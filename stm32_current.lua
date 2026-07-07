@@ -28,6 +28,21 @@ local WAIT_INFO_INTERVAL_MS = 10000
 local last_wait_info_ms = 0
 local MAX_BYTES_PER_CYCLE = 128
 local MAX_LINES_PER_CYCLE = 12
+local mirrored_voltage
+
+local function publish_unhealthy()
+    local state = BattMonitorScript_State()
+    state:healthy(false)
+
+    local out_volts = mirrored_voltage()
+    if out_volts then
+        state:voltage(out_volts)
+    end
+
+    state:current_amps(0)
+    state:cell_count(1)
+    battery:handle_scripting(BATT_INSTANCE, state)
+end
 
 local function batt1_voltage_valid(v)
     return v and v > 5.0 and v < 60.0
@@ -57,7 +72,7 @@ local function batt1_ready()
     return last_batt1_volts ~= nil
 end
 
-local function mirrored_voltage()
+mirrored_voltage = function()
     local v = read_batt1_voltage()
     if v then
         last_batt1_volts = v
@@ -163,8 +178,10 @@ function update()
         end
 
         if age < 0 then
+            publish_unhealthy()
             gcs:send_text(6, string.format("STM32 Batt: no valid frame yet (bytes=%d bad=%d)", bytes_seen, bad_lines))
         elseif age > STALE_WARN_MS then
+            publish_unhealthy()
             gcs:send_text(4, string.format("STM32 Batt: stale %dms (frames=%d bytes=%d)", age, parsed_frames, bytes_seen))
         else
             gcs:send_text(7, string.format("STM32 Batt: ok frames=%d bad=%d", parsed_frames, bad_lines))

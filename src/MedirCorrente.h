@@ -6,11 +6,12 @@
 // Estrutura para facilitar o transporte dos dados
 struct DadosCorrente {
     float correnteDC;  // Valor médio em Amperes
+    float mediaRawDC;
+    float tensaoDiferencaDC;
 };
 
 // Protótipos das funções
 void configurarSensoresCorrente();
-void calibrarZeroCorrente(); // <--- Função crítica para corrigir o "offset"
 DadosCorrente lerSensoresCorrente();
 
 #endif
