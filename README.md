@@ -15,7 +15,7 @@ Pixhawk runs a Lua script that parses this frame and updates a battery monitor i
 - STM32 output format: `BATT,<voltage>,<current>` (example: `BATT,5.00,12.34`)
 - Pixhawk side: Lua script `stm32_current.lua` using `serial:find_serial(0)` + `battery:handle_scripting(...)`
 
-## Wiring (Bluepill <-> Pixhawk)
+## Wiring (ACS758 <-> Bluepill <-> Pixhawk)
 
 - PA0  : ACS758 analog output (OU1 ACS758 output -> PA0)
 - PA9  : USART1 TX -> Pixhawk TELEM RX (e.g. TELEM1 RX)
@@ -23,6 +23,10 @@ Pixhawk runs a Lua script that parses this frame and updates a battery monitor i
 - GND  : common ground between Bluepill, ACS758 and Pixhawk
 - 3.3V : power for ACS758 sensor (from Bluepill 3.3V output)
 - 5V   : power from Pixhawk (VIN/USB 5V)
+
+TELEM port pinout wiring:
+
+![TELEM port pinout wiring](imgs/Telem.png)
 
 ## Pixhawk (ArduPilot) serial + scripting setup
 
@@ -88,9 +92,8 @@ If data still does not arrive in Lua, verify the selected serial port has both
 
 Use this first. Gain calibration is only valid after offset is correct.
 
-- Set `DEBUG = 0` in `src/main.cpp` to use the real sensor path.
 - Set `USB_DEBUG = 1` in `src/main.cpp` to print diagnostics over USB.
-- Ensure the drone/load path is truly idle (`0.00 A` real current).
+- Ensure the battery is disconnected (`0.00 A` real current).
 - Build + flash, then open USB serial monitor at `115200`.
 - Record a stable window of lines like `raw=731.71 deltaV=-0.27772 currentA=-19.24`.
 - Compute the average of `raw` over 20 to 100 samples.

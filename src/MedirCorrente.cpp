@@ -16,8 +16,8 @@ const float NOISE_DEADZONE_AMPS = 0.05;       // Clamp only tiny near-zero noise
 // ACS758 sensitivity in V/A (example: 13.2mV/A at 3.3V).
 const float SENSIBILIDADE_V_A = 0.0132;
 // Calibration multiplier (reference_current / measured_current).
-const float CURRENT_GAIN_CAL = -11.23f; // Fine-trimmed from Fluke points: 1.26/1.15 and 1.50/1.33.
-const float OFFSET_DC_DEFAULT = 731.72f;      // Fixed zero-current ADC offset from latest confirmed 0.00A samples.
+const float CURRENT_GAIN_CAL = -14.75f; // Fine-trimmed from latest point: Fluke 0.93A vs sensor 1.16A.
+const float OFFSET_DC_DEFAULT = 730.16f;      // Fixed zero-current ADC offset from latest confirmed 0.00A samples.
 
 // Runtime offset used by conversion.
 float offset_DC  = OFFSET_DC_DEFAULT;
