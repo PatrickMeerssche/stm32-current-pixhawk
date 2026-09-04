@@ -13,11 +13,25 @@ const float ADC_SCALE = 4095.0;
 // Sampling and sensor parameters.
 const unsigned long SAMPLING_WINDOW_MS = 80;  // Keep aligned with main loop timing.
 const float NOISE_DEADZONE_AMPS = 0.05;       // Clamp only tiny near-zero noise to zero.
+
+// ACS758-100B----------
 // ACS758 sensitivity in V/A (example: 13.2mV/A at 3.3V).
-const float SENSIBILIDADE_V_A = 0.0132;
+// const float SENSIBILIDADE_V_A = 0.0132;
 // Calibration multiplier (reference_current / measured_current).
-const float CURRENT_GAIN_CAL = -14.75f; // Fine-trimmed from latest point: Fluke 0.93A vs sensor 1.16A.
-const float OFFSET_DC_DEFAULT = 464.00f;      // Fixed zero-current ADC offset from latest confirmed 0.00A samples.
+// const float CURRENT_GAIN_CAL = -14.75f; // Fine-trimmed from latest point: Fluke 0.93A vs sensor 1.16A.
+// const float OFFSET_DC_DEFAULT = 464.00f;      // Fixed zero-current ADC offset from latest confirmed 0.00A samples.
+// ACS758-100B----------
+
+// ACS758 KCB-150A ----------
+// Nominal sensitivity for the ACS758 KCB-150A at 3.3 V supply: ~13.2 mV/A.
+const float SENSIBILIDADE_V_A = 0.0132f;
+// Gain correction from live calibration: 1.30 A true / 0.98 A measured ≈ 1.3265.
+const float CURRENT_GAIN_CAL = 1.33f;
+// Measured 0 A ADC average from live calibration: ~2027.74 counts.
+const float OFFSET_DC_DEFAULT = 2027.74f;
+// ACS758 KCB-150A ----------
+
+
 
 // Runtime offset used by conversion.
 float offset_DC  = OFFSET_DC_DEFAULT;

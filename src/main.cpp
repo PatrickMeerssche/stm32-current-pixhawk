@@ -29,7 +29,7 @@
 static const uint8_t DEBUG = 0;
 // USB_DEBUG: when set to 1 the firmware prints sensor diagnostics to the USB
 // serial console. Set `USB_DEBUG = 0` to keep USB output quiet during normal use.
-static const uint8_t USB_DEBUG = 0;
+static const uint8_t USB_DEBUG = 1;
 
 
 static HardwareSerial &TelemetrySerial = Serial1;

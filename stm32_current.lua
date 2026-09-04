@@ -1,7 +1,7 @@
 -- Script to read STM32 current sensor data via serial and feed ArduPilot's
 -- scripting battery monitor.
 
-local SCRIPT_VERSION = "v4-Patched"
+local SCRIPT_VERSION = "v5"
 
 local port = serial:find_serial(0)
 if not port then
@@ -67,12 +67,24 @@ mirrored_voltage = function()
     return last_batt1_volts
 end
 
+-- Debug/logging control: set to true to enable regular diagnostic prints.
+local DEBUG = false
+-- Track the last reported bad frame count so we only notify on new bad frames
+local last_reported_bad_lines = 0
+
+local function send_text_debug(level, msg, force)
+    if force then
+        gcs:send_text(level, msg)
+        return
+    end
+    if DEBUG then gcs:send_text(level, msg) end
+end
 local function process_line(line)
-    -- FIX 1: Relaxed regex. Drops ^ and $ anchors to ignore hidden garbage bytes (e.g. \0)
     local volts_str, amps_str = line:match("BATT%s*,%s*([%d%.%-]+)%s*,%s*([%d%.%-]+)")
     
     if not volts_str or not amps_str then
         bad_lines = bad_lines + 1
+        send_text_debug(4, string.format("STM32 Batt: bad frame #%d (parse fail): '%s'", bad_lines, line), true)
         return
     end
 
@@ -80,11 +92,13 @@ local function process_line(line)
     local amps = tonumber(amps_str)
     if not volts or not amps then
         bad_lines = bad_lines + 1
+        send_text_debug(4, string.format("STM32 Batt: bad frame #%d (number fail): '%s'", bad_lines, line), true)
         return
     end
 
     if volts < 0 or volts > 60 or amps < -200 or amps > 200 then
         bad_lines = bad_lines + 1
+        send_text_debug(4, string.format("STM32 Batt: bad frame #%d (range fail): '%s'", bad_lines, line), true)
         return
     end
 
@@ -93,11 +107,11 @@ local function process_line(line)
         out_volts = volts
         if not using_frame_voltage then
             using_frame_voltage = true
-            gcs:send_text(4, "STM32 Batt: using frame voltage fallback")
+            send_text_debug(4, "STM32 Batt: using frame voltage fallback", false)
         end
     elseif using_frame_voltage then
         using_frame_voltage = false
-        gcs:send_text(6, "STM32 Batt: restored BATT1 voltage mirror")
+        send_text_debug(6, "STM32 Batt: restored BATT1 voltage mirror", false)
     end
 
     local ok_state, state = pcall(BattMonitorScript_State)
@@ -143,29 +157,35 @@ local function update_impl()
 
     if now - last_diag_ms >= DIAG_INTERVAL_MS then
         last_diag_ms = now
-        
-        -- FIX 2: Prevent negative age if last_good_ms > now
         local age = -1
         if last_good_ms > 0 then
             age = now - last_good_ms
             if age < 0 then age = 0 end 
         end
-
         if age < 0 then
             publish_unhealthy()
-            gcs:send_text(6, string.format("STM32 Batt: no valid frame yet (bytes=%d bad=%d)", bytes_seen, bad_lines))
+            -- always notify when we have no valid frame yet
+            send_text_debug(6, string.format("STM32 Batt: no valid frame yet (bytes=%d bad=%d)", bytes_seen, bad_lines), true)
         elseif age > STALE_WARN_MS then
             publish_unhealthy()
-            gcs:send_text(4, string.format("STM32 Batt: stale %dms (frames=%d bytes=%d)", math.floor(age), parsed_frames, bytes_seen))
+            -- always notify when stale
+            send_text_debug(4, string.format("STM32 Batt: stale %dms (frames=%d bytes=%d)", math.floor(age), parsed_frames, bytes_seen), true)
         else
-            gcs:send_text(7, string.format("STM32 Batt: ok frames=%d bad=%d", parsed_frames, bad_lines))
+            -- normal OK diagnostics only when DEBUG enabled
+            send_text_debug(7, string.format("STM32 Batt: ok frames=%d bad=%d", parsed_frames, bad_lines), false)
+        end
+
+        -- If we've seen new bad frames since last report, notify (forced)
+        if bad_lines > last_reported_bad_lines then
+            last_reported_bad_lines = bad_lines
+            send_text_debug(4, string.format("STM32 Batt: bad frame(s) detected total=%d", bad_lines), true)
         end
     end
 
     if now - last_wait_info_ms >= WAIT_INFO_INTERVAL_MS then
         last_wait_info_ms = now
         if last_good_ms == 0 then
-            gcs:send_text(6, string.format("STM32 Batt: alive loops=%d bytes=%d", loop_count, bytes_seen))
+            send_text_debug(6, string.format("STM32 Batt: alive loops=%d bytes=%d", loop_count, bytes_seen), false)
         end
     end
 
